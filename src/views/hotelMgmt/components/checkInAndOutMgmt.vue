@@ -3,18 +3,18 @@
     <!-- 表格渲染 -->
 		<el-table border :fit="true" ref="tableData" max-height="750" style="width: 100%" :data="checkInData" highlight-current-row :row-class-name="tableRowClassName">
 			<el-table-column type="index" label="序号" width="60"></el-table-column>
-			<el-table-column prop="id" v-if="false"></el-table-column>
-			<el-table-column prop="roomNo" label="房号"></el-table-column>
+			<el-table-column prop="cid" v-if="false"></el-table-column>
+			<el-table-column prop="roomNumber" label="房号"></el-table-column>
 			<el-table-column prop="status" label="状态" :formatter="formatStatus"></el-table-column>
 			<el-table-column prop="roomType" label="类型"></el-table-column>
 			<el-table-column prop="startTime" label="开出时间" :formatter="formatCheckInTime" width="160"></el-table-column>
 			<el-table-column prop="endTime" label="到期时间" :formatter="formatCheckOutTime" width="160"></el-table-column>
-			<el-table-column prop="infactPrice" label="实收（元）"></el-table-column>
+			<el-table-column prop="roomprice" label="实收（元）"></el-table-column>
       <el-table-column prop="roomPrice" label="定价（元）"></el-table-column>
 			<el-table-column prop="name" label="姓名"></el-table-column>
 			<el-table-column prop="sex" label="性别" :formatter="formatSex"></el-table-column>
-			<el-table-column prop="creNo" label="证件号" width="170"></el-table-column>
-			<el-table-column prop="remark" label="备注"></el-table-column>
+			<el-table-column prop="identityNumber" label="证件号" width="170"></el-table-column>
+			<el-table-column prop="note" label="备注"></el-table-column>
 			<el-table-column fixed="right" label="操作" width="160">
 			<template slot-scope="scope">
 				<el-button size="medium" type="text" @click="handleCheckIn(scope.$index,scope.row)" :disabled="scope.row.checkInVisible">开房</el-button>
@@ -83,7 +83,6 @@
 <script>
   import { listCheckIn, saveCustomer, deleteCheckIn, getFreeRoom, changRoom } from '@/views/hotelMgmt/apis'
   export default {
-    inject: ['reload'],
     data () {
       var validPrice = (rule, value, callback) => {
         let reg = /^[0-9]*$/
@@ -157,7 +156,7 @@
       loadData () {
         listCheckIn()
         .then(res => {
-          if (res.errorcode === '00000') {
+          if (res.code === 200) {
             var checkInData = res.data
             for (var data of checkInData) {
               data.checkInVisible = false

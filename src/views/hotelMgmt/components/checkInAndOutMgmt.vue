@@ -3,13 +3,13 @@
     <!-- 表格渲染 -->
 		<el-table border :fit="true" ref="tableData" max-height="750" style="width: 100%" :data="checkInData" highlight-current-row :row-class-name="tableRowClassName">
 			<el-table-column type="index" label="序号" width="60"></el-table-column>
-			<el-table-column prop="cid" v-if="false"></el-table-column>
+			<el-table-column prop="cid" v-if="true"></el-table-column>
 			<el-table-column prop="roomNumber" label="房号"></el-table-column>
 			<el-table-column prop="status" label="状态" :formatter="formatStatus"></el-table-column>
 			<el-table-column prop="roomType" label="类型"></el-table-column>
 			<el-table-column prop="startTime" label="开出时间" :formatter="formatCheckInTime" width="160"></el-table-column>
 			<el-table-column prop="endTime" label="到期时间" :formatter="formatCheckOutTime" width="160"></el-table-column>
-			<el-table-column prop="roomprice" label="实收（元）"></el-table-column>
+			<el-table-column prop="roomPrice" label="实收（元）"></el-table-column>
       <el-table-column prop="roomPrice" label="定价（元）"></el-table-column>
 			<el-table-column prop="name" label="姓名"></el-table-column>
 			<el-table-column prop="sex" label="性别" :formatter="formatSex"></el-table-column>
@@ -26,37 +26,37 @@
 
      <!-- 开房 弹出框 -->
     <el-dialog title="录入住宿信息" :visible.sync="customerDialogVisible" center width="40%">
-      <el-form :model="customerInfo" :inline="true" :rules="rules" label-width="100px" ref="customerInfo">
-        <el-form-item label="房号" prop="roomNo">
-          <el-input v-model="customerInfo.roomNo" style="width:218px" :readonly="true"></el-input>
+      <el-form :model="customer" :inline="true" :rules="rules" label-width="100px" ref="customer">
+        <el-form-item label="房号" prop="roomNumber">
+          <el-input v-model="customer.roomNumber" style="width:218px" :readonly="true"></el-input>
         </el-form-item>
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="customerInfo.name" placeholder="请输入姓名" style="width:218px"></el-input>
+          <el-input v-model="customer.name" placeholder="请输入姓名" style="width:218px"></el-input>
         </el-form-item>
         <el-form-item label="性别">
-          <el-select v-model="customerInfo.sex">
+          <el-select v-model="customer.sex">
             <el-option v-for="item in sexOpt" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="证件号" prop="creNo">
-          <el-autocomplete v-model="customerInfo.creNo" placeholder="请输入证件号" style="width:218px" :fetch-suggestions="querySearch"></el-autocomplete>
+        <el-form-item label="证件号" prop="identityNumber">
+          <el-autocomplete v-model="customer.identityNumber" placeholder="请输入证件号" style="width:218px" :fetch-suggestions="querySearch"></el-autocomplete>
         </el-form-item>
         <el-form-item label="开出时间" prop="startTime">
-          <el-date-picker v-model="customerInfo.startTime" placeholder="请选择开房时间" :editable="false" :picker-options="pickerOptionsS" type="datetime" style="width:218px"></el-date-picker>
+          <el-date-picker v-model="customer.startTime" placeholder="请选择开房时间" :editable="false" :picker-options="pickerOptionsS" type="datetime" style="width:218px"></el-date-picker>
         </el-form-item>
         <el-form-item label="到期时间" prop="endTime">
-          <el-date-picker v-model="customerInfo.endTime" placeholder="请选择到期时间" :editable="false" :picker-options="pickerOptionsE" type="datetime" style="width:218px"></el-date-picker>
+          <el-date-picker v-model="customer.endTime" placeholder="请选择到期时间" :editable="false" :picker-options="pickerOptionsE" type="datetime" style="width:218px"></el-date-picker>
         </el-form-item>
-        <el-form-item label="房费" prop="infactPrice">
-          <el-input v-model="customerInfo.infactPrice" placeholder="请输入房费" style="width:218px"></el-input>
-        </el-form-item>
+        <!-- <el-form-item label="房费" prop="roomPrice">
+          <el-input v-model="customer.roomPrice" placeholder="请输入房费" style="width:218px"></el-input>
+        </el-form-item> -->
         <el-form-item label="备注">
-          <el-input v-model="customerInfo.remark" placeholder="请输入备注" style="width:218px"></el-input>
+          <el-input v-model="customer.note" placeholder="请输入备注" style="width:218px"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button  @click="customerDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveCustomer('customerInfo')">保存</el-button>
+        <el-button type="primary" @click="saveCustomer('customer')">保存</el-button>
       </span>
     </el-dialog>
 
@@ -96,27 +96,25 @@
         checkInData: [],
         customerDialogVisible: false,
         changeRoomDialogVisible: false,
-        sexOpt: [{'value': 0, 'label': '男'}, {'value': 1, 'label': '女'}],
-        customerInfo: {
-          id: '',
-          roomNo: '',
+        sexOpt: [{'value': 0, 'label': '女'}, {'value': 1, 'label': '男'}],
+        customer: {
+          roomNumber: '',
           name: '',
           sex: undefined,
-          infactPrice: undefined,
-          creNo: undefined,
-          remark: '',
+          identityNumber: '',
+          note: '',
           startTime: new Date(),
           endTime: undefined
         },
         sels: [],
         freeRoom: [],
         currentId: undefined,
-        currentRoomNo: undefined,
-        changeRoomNo: undefined,
+        currentRoomNo: '',
+        changeRoomNo: '',
         idNumPref: [{'value': '422325'}, {'value': '421223'}, {'value': '421202'}, {'value': '421222'}, {'value': '421224'}, {'value': '421281'}, {'value': '421221'}],
         pickerOptionsS: {
           disabledDate: (time) => {
-            let endTime = this.customerInfo.endTime
+            let endTime = this.customer.endTime
             if (endTime) {
               return time.getTime() > endTime - 8.64e7 || time.getTime() < Date.now() - 8.64e7
             }
@@ -125,7 +123,7 @@
         },
         pickerOptionsE: {
           disabledDate: (time) => {
-            let startTime = this.customerInfo.startTime
+            let startTime = this.customer.startTime
             if (startTime) {
               return time.getTime() < startTime
             }
@@ -142,7 +140,7 @@
           endTime: [
             { required: true, message: '请选择到期时间', trigger: 'change' }
           ],
-          infactPrice: [
+          roomPrice: [
             { required: true, message: '请填写房费', trigger: 'change' },
             { validator: validPrice, trigger: 'change' }
           ]
@@ -174,20 +172,19 @@
       },
       handleCheckIn (index, row) {
         this.customerDialogVisible = true
-        this.customerInfo.roomNo = row.roomNo
-        this.customerInfo.infactPrice = row.roomPrice
-        this.customerInfo.sex = 0
-        this.customerInfo.name = ''
-        this.customerInfo.remark = undefined
-        this.customerInfo.creNo = undefined
-        this.customerInfo.endTime = this.getTomorrow()
+        this.customer.roomNumber = row.roomNumber
+        this.customer.sex = 0
+        this.customer.name = ''
+        this.customer.note = undefined
+        this.customer.identityNumber = undefined
+        this.customer.endTime = this.getTomorrow()
       },
       saveCustomer (formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            saveCustomer(this.customerInfo)
+            saveCustomer(this.customer)
             .then(res => {
-              if (res.errorcode === '00000') {
+              if (res.code === 200) {
                 this.$message({
                   type: 'success',
                   message: '开房成功！'
@@ -207,7 +204,7 @@
         })
       },
       handleChangeRoom (index, row) {
-        getFreeRoom(row.roomNo)
+        getFreeRoom(row.roomNumber)
         .then(res => {
           this.freeRoom = res.data
           if (this.freeRoom.length < 1) {
@@ -217,16 +214,16 @@
             })
           } else {
             this.changeRoomDialogVisible = true
-            this.currentRoomNo = row.roomNo
+            this.currentRoomNo = row.roomNumber
             this.changeRoomNo = undefined
-            this.currentId = row.id
           }
         })
       },
       handleCheckOut (index, row) {
-        deleteCheckIn(row.id)
+        // console.log(row.roomNumber)
+        deleteCheckIn(row.roomNumber)
         .then(res => {
-          if (res.errorcode === '00000') {
+          if (res.code === 200) {
             this.$message({
               type: 'success',
               message: '退房成功！'
@@ -253,9 +250,9 @@
       },
       formatSex (row) {
         if (row.sex === 0) {
-          return '男'
-        } else if (row.sex === 1) {
           return '女'
+        } else if (row.sex === 1) {
+          return '男'
         } else {
           return row.sex
         }
@@ -274,9 +271,9 @@
         return ''
       },
       confirmChangeRoom () {
-        changRoom(this.currentId, this.changeRoomNo)
+        changRoom(this.currentRoomNo, this.changeRoomNo)
         .then(res => {
-          if (res.errorcode === '00000') {
+          if (res.code === 200) {
             this.$message({
               type: 'success',
               message: '换房成功！'
